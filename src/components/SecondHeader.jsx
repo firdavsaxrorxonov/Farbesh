@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 function Header() {
   return (
     <header className="flex justify-between items-center mx-auto pb-6 border-[#737371] border-b w-full max-w-md select-none">
-      <Link to={"/home"} className="flex items-center gap-2 text-white text-xl">
+      <Link to={"/home"} className="flex items-center gap-2 text-black text-xl">
         <img src={Logo} className="rounded-full w-12 h-12" alt="FarBesh Logo" />
         <h1 className="font-bold">Farbesh Go</h1>
       </Link>

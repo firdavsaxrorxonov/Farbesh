@@ -4,8 +4,7 @@ import Location from "../assets/location.png";
 import navBurger from "../assets/burger.svg";
 import { AiOutlineClose } from "react-icons/ai";
 import LogOut from "../assets/logout.png";
-import { Link, useNavigate } from "react-router-dom";
-// import { postData } from "../api/service";
+import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import axios from "axios";
 
@@ -19,22 +18,28 @@ function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [passengerCount, setPassengerCount] = useState("");
   const [gender, setGender] = useState("");
-  const phoneRef = useRef('');
+  const phoneRef = useRef("");
   const [isOrderButtonDisabled, setIsOrderButtonDisabled] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const navigate = useNavigate();
   const token = Cookies.get("token");
 
+  useEffect(() => {
+    if (gender === "mail") {
+      setPassengerCount(0);
+    }
+  }, [gender]);
+
   const orderData = {
-    "direction": `${route}`,
-    "phone_number": `+998${phone.replace(/\s|-/g, '')}`,
-    "passengers_count": passengerCount,
-    "gender": `${gender}`,
-    "latitude": userLocation ? userLocation[0] : null,
-    "longitude": userLocation ? userLocation[1] : null,
+    direction: `${route}`,
+    phone_number: `+998${phone.replace(/\s|-/g, "")}`,
+    passengers_count: passengerCount,
+    gender: `${gender}`,
+    latitude: userLocation ? userLocation[0] : null,
+    longitude: userLocation ? userLocation[1] : null,
   };
 
-  function handleOrderClick() {
+  async function handleOrderClick() {
     if (!userLocation) {
       alert("Lokatsiya aniqlanmadi. Iltimos, lokatsiyangizni tekshiring.");
       return;
@@ -50,7 +55,7 @@ function Home() {
       return;
     }
 
-    if (!passengerCount) {
+    if (gender !== "mail" && !passengerCount) {
       alert("Iltimos, yo'lovchi sonini tanlang.");
       return;
     }
@@ -61,37 +66,39 @@ function Home() {
     }
 
     setIsOrderButtonDisabled(true);
-    setIsLoading(true); // Set loading state to true
+    setIsLoading(true);
 
-    axios.post("https://farbesh.up.railway.app/api/v1/send_order/", orderData, {
-      headers: {
-        Authorization: `Token ${Cookies.get('token')}`
-      }
-    })
+    await axios
+      .post("https://farbesh.up.railway.app/api/v1/send_order/", orderData, {
+        headers: {
+          Authorization: `Token ${Cookies.get("token")}`,
+        },
+      })
       .then((response) => {
-        console.log("Success:", response.data);
-        alert("Sizning so'rovingiz muvaffaqiyatli yuborildi. Tez orada siz bilan bog'lanishadi! ✅");
+        alert(
+          "Sizning so'rovingiz muvaffaqiyatli yuborildi. Tez orada siz bilan bog'lanishadi! ✅"
+        );
         setIsModalOpen(false);
         setRoute("");
         setPassengerCount("");
         setGender("");
         setPhone("");
-        startCountdown(300); // Start countdown
+        startCountdown(300);
       })
       .catch((error) => {
-        console.error("Xatolik:", error);
         alert("Xatolik yuz berdi. Qayta urinib ko‘ring.");
         setIsOrderButtonDisabled(false);
       })
       .finally(() => {
-        setIsLoading(false); // Reset loading state
+        setIsLoading(false);
       });
   }
 
-
-
   const startCountdown = (duration) => {
     let timeRemaining = duration;
+
+    // Save initial countdown time to localStorage
+    localStorage.setItem("orderDisabledTime", Date.now() + timeRemaining * 1000);
 
     const interval = setInterval(() => {
       if (timeRemaining <= 0) {
@@ -101,6 +108,7 @@ function Home() {
         localStorage.removeItem("orderDisabledTime");
       } else {
         setCountdown(timeRemaining);
+        localStorage.setItem("orderDisabledTime", Date.now() + timeRemaining * 1000); // Update the countdown in localStorage
         timeRemaining--;
       }
     }, 1000);
@@ -115,6 +123,8 @@ function Home() {
         setIsOrderButtonDisabled(true);
         setCountdown(Math.ceil(remainingTime / 1000));
         startCountdown(Math.ceil(remainingTime / 1000));
+      } else {
+        localStorage.removeItem("orderDisabledTime"); // Clear if time is up
       }
     }
   }, []);
@@ -126,19 +136,23 @@ function Home() {
     }
   }, [alertMessage]);
 
-
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
         setUserLocation([latitude, longitude]);
-        console.log("Koordinatalar:", latitude, longitude);
       },
       (error) => {
         if (error.code === error.PERMISSION_DENIED) {
-          setAlertMessage({ text: "Iltimos, lokatsiya funksiyasini yoqing.", type: "error" });
+          setAlertMessage({
+            text: "Iltimos, lokatsiya funksiyasini yoqing.",
+            type: "error",
+          });
         } else {
-          setAlertMessage({ text: "Lokatsiya aniqlanmadi, qaytadan urinib ko‘ring.", type: "error" });
+          setAlertMessage({
+            text: "Lokatsiya aniqlanmadi, qaytadan urinib ko‘ring.",
+            type: "error",
+          });
         }
       }
     );
@@ -146,7 +160,10 @@ function Home() {
 
   const handleLocation = () => {
     if (!navigator.geolocation) {
-      setAlertMessage({ text: "Geolokatsiya funksiyasi qo‘llab-quvvatlanmaydi.", type: "error" });
+      setAlertMessage({
+        text: "Geolokatsiya funksiyasi qo‘llab-quvvatlanmaydi.",
+        type: "error",
+      });
       return;
     }
 
@@ -157,9 +174,15 @@ function Home() {
       },
       (error) => {
         if (error.code === error.PERMISSION_DENIED) {
-          setAlertMessage({ text: "Iltimos, lokatsiya funksiyasini yoqing.", type: "error" });
+          setAlertMessage({
+            text: "Iltimos, lokatsiya funksiyasini yoqing.",
+            type: "error",
+          });
         } else {
-          setAlertMessage({ text: "Lokatsiya aniqlanmadi, qaytadan urinib ko‘ring.", type: "error" });
+          setAlertMessage({
+            text: "Lokatsiya aniqlanmadi, qaytadan urinib ko‘ring.",
+            type: "error",
+          });
         }
       }
     );
@@ -187,7 +210,10 @@ function Home() {
 
     let formatted = "";
     if (value.length > 7) {
-      formatted = `${value.slice(0, 2)} ${value.slice(2, 5)}-${value.slice(5, 7)}-${value.slice(7)}`;
+      formatted = `${value.slice(0, 2)} ${value.slice(2, 5)}-${value.slice(
+        5,
+        7
+      )}-${value.slice(7)}`;
     } else if (value.length > 5) {
       formatted = `${value.slice(0, 2)} ${value.slice(2, 5)}-${value.slice(5)}`;
     } else if (value.length > 2) {
@@ -201,7 +227,10 @@ function Home() {
 
   return (
     <div className="relative flex flex-col bg-gray-100 mx-auto max-w-md h-dvh font-display">
-      <div className={`transition ${isModalOpen ? "blur-sm pointer-events-none" : ""}`}>
+      <div
+        className={`transition ${isModalOpen ? "blur-sm pointer-events-none" : ""
+          }`}
+      >
         <button
           onClick={(event) => {
             event.stopPropagation();
@@ -221,19 +250,25 @@ function Home() {
               onClick={handleLocation}
             >
               <img src={Location} alt="" width={20} />
-              Lokatsiya
+              Joylashuv
             </button>
           </div>
           <div className="flex justify-center items-center">
             {isOrderButtonDisabled && (
-              <div className="text-red-500 mb-2">
-                {`Qolgan vaqt: ${Math.floor(countdown / 60)}:${(countdown % 60).toString().padStart(2, '0')}`}
+              <div className="text-red-500 text-sm mb-2">
+                {`${Math.floor(countdown / 60)}:${(countdown % 60)
+                  .toString()
+                  .padStart(2, "0")} dan so'ng buyurtma bera olasiz`}
               </div>
             )}
             <button
               disabled={isOrderButtonDisabled}
-              className={`bottom-3 absolute bg-[#151513] px-24 py-4 rounded-[12px] font-semibold text-white active:scale-95 transition-opacity duration-300 cursor-pointer ${isOrderButtonDisabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}`}
-              onClick={() => setIsModalOpen(true)}>
+              className={`bottom-3 absolute bg-[#151513] px-24 py-4 mb-2 rounded-[12px] font-semibold text-white active:scale-95 transition-opacity duration-300 cursor-pointer ${isOrderButtonDisabled
+                ? "opacity-50 cursor-not-allowed"
+                : "opacity-100"
+                }`}
+              onClick={() => setIsModalOpen(true)}
+            >
               Buyurtma berish
             </button>
           </div>
@@ -242,29 +277,27 @@ function Home() {
       {isModalOpen && (
         <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/50 backdrop-blur-sm">
           <div className="relative bg-white shadow-2xl p-6 rounded-xl w-[340px] h-auto">
-            <h3 className="mb-4 font-semibold text-2xl text-center">Buyurtma berish</h3>
-            <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
+            <h3 className="mb-4 font-semibold text-2xl text-center">
+              Buyurtma berish
+            </h3>
+            <form
+              className="flex flex-col gap-4"
+              onSubmit={(e) => e.preventDefault()}
+            >
               <select
                 value={route}
                 onChange={(e) => setRoute(e.target.value)}
                 className="bg-white p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFDC71] w-full text-gray-800 text-sm"
               >
-                <option value="" disabled>🚖 Qayerdan? - Qayerga?</option>
-                <option value="Beshariq-Farg'ona">📍 Beshariqdan - Farg‘onaga</option>
-                <option value="Farg'ona-Beshariq">📍 Farg‘onadan - Beshariqga</option>
-              </select>
-
-              <select
-                value={passengerCount}
-                onChange={(e) => setPassengerCount(e.target.value)}
-                className="bg-white p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFDC71] w-full text-gray-800 text-sm"
-              >
-                <option value="" disabled>🔢 Yo‘lovchi tanlash</option>
-                <option value="1">🧍 1 kishi</option>
-                <option value="2">🧑‍🤝‍🧑 2 kishi</option>
-                <option value="3">👨‍👩‍👦 3 kishi</option>
-                <option value="4">👨‍👩‍👧‍👦 4 kishi</option>
-                <option value="5">📦 Po'chta</option>
+                <option value="" disabled>
+                  🚖 Qayerdan? - Qayerga?
+                </option>
+                <option value="Beshariq-Farg'ona">
+                  📍 Beshariqdan - Farg‘onaga
+                </option>
+                <option value="Farg'ona-Beshariq">
+                  📍 Farg‘onadan - Beshariqga
+                </option>
               </select>
 
               <select
@@ -272,10 +305,29 @@ function Home() {
                 onChange={(e) => setGender(e.target.value)}
                 className="bg-white p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFDC71] w-full text-gray-800 text-sm"
               >
-                <option value="" disabled>🚻 Erkak yoki Ayol?</option>
+                <option value="" disabled>
+                  🚻 Erkak yoki Ayol?
+                </option>
                 <option value="male">👨 Erkak</option>
                 <option value="female">👩 Ayol</option>
+                <option value="mail">📦 Po'chta</option>
               </select>
+
+              {gender === "" || gender === "male" || gender === "female" ? (
+                <select
+                  value={passengerCount}
+                  onChange={(e) => setPassengerCount(e.target.value)}
+                  className="bg-white p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFDC71] w-full text-gray-800 text-sm"
+                >
+                  <option value="" disabled>
+                    🔢 Yo‘lovchi tanlash
+                  </option>
+                  <option value="1">🧍 1 kishi</option>
+                  <option value="2">🧑‍🤝‍🧑 2 kishi</option>
+                  <option value="3">👨‍👩‍👦 3 kishi</option>
+                  <option value="4">👨‍👩‍👧‍👦 4 kishi</option>
+                </select>
+              ) : null}
 
               <input
                 ref={phoneRef}
@@ -286,55 +338,50 @@ function Home() {
                 className="bg-white p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFDC71] w-full text-gray-800 text-sm"
                 maxLength={17}
               />
-              {/* <button onClick={handleOrderClick} className="bg-[#151513] shadow-md py-3 rounded-[12px] w-full font-semibold text-white active:scale-95 transition-all duration-300 cursor-pointer">
-                Buyurtma berish
-              </button> */}
               <button
                 onClick={handleOrderClick}
                 disabled={isOrderButtonDisabled}
                 className={`bg-[#151513] shadow-md py-3 rounded-[12px] w-full font-semibold text-white active:scale-95 transition-all duration-300 cursor-pointer
-    ${isLoading ? 'opacity-50' : 'opacity-100'}`} // Opacity ni kamaytirish
+    ${isLoading ? "opacity-50" : "opacity-100"}`}
               >
-                {isLoading ? 'Yuborilmoqda...' : 'Buyurtma berish'} {/* Tugma matni */}
+                {isLoading ? "Yuborilmoqda..." : "Buyurtma berish"}
               </button>
-
             </form>
-            <button className="top-4 right-4 absolute text-gray-500 hover:text-gray-700 cursor-pointer" onClick={() => { setIsModalOpen(false), setRoute(""), setPassengerCount(""), setGender(""), setPhone("") }}>
+            <button
+              className="top-4 right-4 absolute text-gray-500 hover:text-gray-700 cursor-pointer"
+              onClick={() => {
+                setIsModalOpen(false),
+                  setRoute(""),
+                  setPassengerCount(""),
+                  setGender(""),
+                  setPhone("");
+              }}
+            >
               <AiOutlineClose className="w-6 h-6" />
             </button>
           </div>
         </div>
-      )
-      }
-      {
-        isOpenUl && (
-          <div className="z-60 fixed flex justify-center items-center opacity-100 mt-[50px] ml-[80px] scale-100 transition-all duration-300">
-            <ul className="flex flex-col gap-[5px] bg-white px-[15px] py-[10px] rounded-md menu-container">
-              {/* <Link to={'/drivers'} className="flex items-center gap-[7px]">
-                <img src={driver} className="w-[25px]" alt="" />
-                <p>Haydovchilar</p>
-              </Link> */}
-              <button
-                onClick={() => {
-                  Cookies.remove("token");
-                  navigate("/");
-                }}
-                className="flex text-red-500 items-center gap-[12px] cursor-pointer"
-              >
-                <img className="ml-[5px] w-[15px]" src={LogOut} alt="" />
-                Chiqish
-              </button>
-
-            </ul>
-          </div>
-        )
-      }
-      {
-        alertMessage && (
-          <div className={`alert ${alertMessage.type}`}>{alertMessage.text}</div>
-        )
-      }
-    </div >
+      )}
+      {isOpenUl && (
+        <div className="z-60 fixed flex justify-center items-center opacity-100 mt-[50px] ml-[80px] scale-100 transition-all duration-300">
+          <ul className="flex flex-col gap-[5px] bg-white px-[15px] py-[10px] rounded-md menu-container">
+            <button
+              onClick={() => {
+                Cookies.remove("token");
+                navigate("/");
+              }}
+              className="flex text-red-500 items-center gap-[12px] cursor-pointer"
+            >
+              <img className="ml-[5px] w-[15px]" src={LogOut} alt="" />
+              Chiqish
+            </button>
+          </ul>
+        </div>
+      )}
+      {alertMessage && (
+        <div className={`alert ${alertMessage.type}`}>{alertMessage.text}</div>
+      )}
+    </div>
   );
 }
 

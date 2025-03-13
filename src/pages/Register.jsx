@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Header from "../components/Header";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import EyesOpen from "../assets/eyesOpen.svg";
 import EyesClosed from "../assets/eyesClosed.svg";
+import SecondHeader from "../components/SecondHeader";
 
 
 function Register() {
@@ -71,7 +71,7 @@ function Register() {
 
   return (
     <div className="relative flex flex-col items-center bg-[#fff] px-6 py-10 min-h-screen overflow-hidden font-display">
-      <Header />
+      <SecondHeader />
       <div className="flex flex-col justify-center items-center mt-5 w-full max-w-md">
         <h1 className="mb-5 font-bold text-xl text-center">
           Roʻyxatdan oʻtish

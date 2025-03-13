@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Header from "../components/Header";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import EyesOpen from "../assets/eyesOpen.svg";
 import EyesClosed from "../assets/eyesClosed.svg";
+import SecondHeader from "../components/SecondHeader";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -23,7 +23,7 @@ function Login() {
       password: pwd,
       ...(isEmail ? { email: username } : { username: username }),
     };
-    console.log(isEmail ? username: "username buu");
+    console.log(isEmail ? username : "username buu");
 
 
     try {
@@ -40,7 +40,7 @@ function Login() {
         Cookies.set("token", data.key);
         riderict("/home");
       }
-    } catch(err) {
+    } catch (err) {
       console.log(err.response?.data);
 
       setErrMsg("Foydalanuvchi nomi yoki parol notog'ri");
@@ -51,7 +51,7 @@ function Login() {
 
   return (
     <div className="relative flex flex-col items-center bg-[#fff] px-6 py-10 min-h-screen overflow-hidden font-display">
-      <Header />
+      <SecondHeader />
 
       <div className="flex flex-col justify-center items-center mt-[20px] mr-[40px] ml-[40px] w-full">
         <h1 className="mb-[20px] font-bold text-xl text-center">
