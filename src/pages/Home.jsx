@@ -7,6 +7,7 @@ import LogOut from "../assets/logout.png";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { IoTime } from "react-icons/io5";
 
 function Home() {
   const [userLocation, setUserLocation] = useState(null);
@@ -98,7 +99,10 @@ function Home() {
     let timeRemaining = duration;
 
     // Save initial countdown time to localStorage
-    localStorage.setItem("orderDisabledTime", Date.now() + timeRemaining * 1000);
+    localStorage.setItem(
+      "orderDisabledTime",
+      Date.now() + timeRemaining * 1000
+    );
 
     const interval = setInterval(() => {
       if (timeRemaining <= 0) {
@@ -108,7 +112,10 @@ function Home() {
         localStorage.removeItem("orderDisabledTime");
       } else {
         setCountdown(timeRemaining);
-        localStorage.setItem("orderDisabledTime", Date.now() + timeRemaining * 1000); // Update the countdown in localStorage
+        localStorage.setItem(
+          "orderDisabledTime",
+          Date.now() + timeRemaining * 1000
+        ); // Update the countdown in localStorage
         timeRemaining--;
       }
     }, 1000);
@@ -228,8 +235,9 @@ function Home() {
   return (
     <div className="relative flex flex-col bg-gray-100 mx-auto max-w-md h-dvh font-display">
       <div
-        className={`transition ${isModalOpen ? "blur-sm pointer-events-none" : ""
-          }`}
+        className={`transition ${
+          isModalOpen ? "blur-sm pointer-events-none" : ""
+        }`}
       >
         <button
           onClick={(event) => {
@@ -255,18 +263,22 @@ function Home() {
           </div>
           <div className="flex justify-center items-center">
             {isOrderButtonDisabled && (
-              <div className="text-red-500 text-sm mb-2">
-                {`${Math.floor(countdown / 60)}:${(countdown % 60)
-                  .toString()
-                  .padStart(2, "0")} dan so'ng buyurtma bera olasiz`}
+              <div className="text-white mb-10 flex gap-3 items-center justify-center absolute bg-black py-2 w-[120px] rounded-[20px] text-sm ">
+                <IoTime size={24} />
+                <p className="w-[38px]">
+                  {`0${Math.floor(countdown / 60)}:${(countdown % 60)
+                    .toString()
+                    .padStart(2, "0")}`}
+                </p>
               </div>
             )}
             <button
               disabled={isOrderButtonDisabled}
-              className={`bottom-3 absolute bg-[#151513] px-24 py-4 mb-2 rounded-[12px] font-semibold text-white active:scale-95 transition-opacity duration-300 cursor-pointer ${isOrderButtonDisabled
-                ? "opacity-50 cursor-not-allowed"
-                : "opacity-100"
-                }`}
+              className={`bottom-3 absolute bg-[#151513] px-24 py-4 mb-2 rounded-[12px] font-semibold text-white active:scale-95 transition-opacity duration-300 cursor-pointer ${
+                isOrderButtonDisabled
+                  ? "opacity-50 cursor-not-allowed"
+                  : "opacity-100"
+              }`}
               onClick={() => setIsModalOpen(true)}
             >
               Buyurtma berish

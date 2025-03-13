@@ -34,7 +34,7 @@ function Start() {
           <img
             src={BgImage}
             alt="Background"
-            className="-bottom-11 z-[-5] absolute w-[220px] h-auto"
+            className="-bottom-11 -z-10 absolute w-[250px] h-auto"
           />
         </div>
 
@@ -42,14 +42,14 @@ function Start() {
           <Link
             to="/login"
             type="button"
-            className="bottom-11 z-10 absolute bg-[#FCE000] bg-gradient-to-r py-3 rounded-lg w-4/5 font-semibold text-black active:scale-95 transition-[0.3s] cursor-pointer"
+            className="bottom-11 z-10 absolute border-2 border-[#FCE000] bg-[#13161ccc] bg-gradient-to-r py-3 rounded-lg w-4/5 font-semibold text-[#FCE000] active:scale-95 transition-[0.3s] cursor-pointer"
           >
             Kirish
           </Link>
           <Link
             to="/register"
             className={
-              "-bottom-3 z-10 absolute font-medium py-1.5 px-3.5 rounded-md bg-[#FCE000] text-black border-2 w-4/5 border-[#FCE000] text-base"
+              "-bottom-3 z-10 absolute font-medium rounded-md  text-black py-3 bg-[#FCE000] w-4/5 text-base"
             }
           >
             Ro'yxatdan o'tish
