@@ -85,7 +85,7 @@ function Register() {
             <input
               type="text"
               placeholder="+998901234567"
-              className="bg-white shadow-sm px-3 py-2 border focus:border-[#FCE000] rounded-md outline-none focus:ring-0 w-full font-medium text-[#0C0E16] placeholder:text-[#0C0E16] text-sm transition-all[0.4s]"
+              className="bg-white shadow-sm px-3 py-2 border focus:border-[#FCE000] rounded-md outline-none focus:ring-0 w-full font-medium text-[#0C0E16] placeholder:text-[#4a4b4e9f] text-sm transition-all[0.4s]"
               value={phone}
               onChange={(e) => {
                 const val = e.target.value;
@@ -102,7 +102,7 @@ function Register() {
             <input
               type={!show1 ? "text" : "password"}
               placeholder="Parol"
-              className="bg-white shadow-sm px-3 py-2 border focus:border-[#FCE000] rounded-md outline-none focus:ring-0 w-full font-medium text-[#0C0E16] placeholder:text-[#0C0E16] text-sm transition-all[0.4s]"
+              className="bg-white shadow-sm px-3 py-2 border focus:border-[#FCE000] rounded-md outline-none focus:ring-0 w-full font-medium text-[#0C0E16] placeholder:text-[#4a4b4e9f] text-sm transition-all[0.4s]"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required

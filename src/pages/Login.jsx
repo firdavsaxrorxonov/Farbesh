@@ -89,7 +89,7 @@ function Login() {
               type="tel"
               inputMode="numeric"
               maxLength={12}
-              className="bg-white shadow-sm px-3 py-2 border focus:border-[#FCE000] rounded-md outline-none focus:ring-0 w-full font-medium text-[#0C0E16] placeholder:text-[#0C0E16] text-sm transition-all[0.4s]"
+              className="bg-white shadow-sm px-3 py-2 border focus:border-[#FCE000] rounded-md outline-none focus:ring-0 w-full font-medium text-[#0C0E16] placeholder:text-[#4a4b4e9f] text-sm transition-all[0.4s]"
               placeholder="998901234567"
               value={username}
               onChange={(e) => {
@@ -104,7 +104,7 @@ function Login() {
           <label className="relative flex flex-col gap-[7px] text-[14px]">
             Parolni kiriting:
             <input
-              className="bg-white shadow-sm px-3 py-2 border focus:border-[#FCE000] rounded-md outline-none focus:ring-0 w-full font-medium text-[#0C0E16] placeholder:text-[#0C0E16] text-sm transition-all[0.4s]"
+              className="bg-white shadow-sm px-3 py-2 border focus:border-[#FCE000] rounded-md outline-none focus:ring-0 w-full font-medium text-[#0C0E16] placeholder:text-[#4a4b4e9f] text-sm transition-all[0.4s]"
               placeholder="Parol"
               type={show ? "password" : "text"}
               value={pwd}
