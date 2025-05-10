@@ -26,13 +26,12 @@ function Home() {
   const token = Cookies.get("token");
 
   useEffect(() => {
-    if (gender === "mail") {
+    if (gender === "other") {
       setPassengerCount(0);
     }
   }, [gender]);
 
   const orderData = {
-    name: "Husanjon",
     phone: `998${phone.replace(/\s|-/g, "")}`,
     location: {
       name: route,
@@ -40,8 +39,15 @@ function Home() {
       long: userLocation ? userLocation[1] : null,
     },
     gender: gender === "male" ? "male" : gender === "female" ? "female" : "other",
-    count: passengerCount === "1" ? "one" : passengerCount === "2" ? "two" : passengerCount === "3" ? "there" : passengerCount === "4" ? "four" : "",
+    ...(gender !== "other" && {
+      count:
+        passengerCount === "1" ? "one" :
+          passengerCount === "2" ? "two" :
+            passengerCount === "3" ? "there" :
+              passengerCount === "4" ? "four" : "",
+    }),
   };
+
 
   async function handleOrderClick() {
     if (!userLocation) {
@@ -59,10 +65,11 @@ function Home() {
       return;
     }
 
-    if (gender !== "mail" && !passengerCount) {
+    if (gender !== "other" && !passengerCount) {
       alert("Iltimos, yo'lovchi sonini tanlang.");
       return;
     }
+
 
     if (!gender) {
       alert("Iltimos, jinsni tanlang.");
@@ -98,6 +105,23 @@ function Home() {
       });
   }
 
+  useEffect(() => {
+    const savedTime = localStorage.getItem("orderDisabledTime");
+
+    if (savedTime) {
+      const remainingTime = parseInt(savedTime, 10) - Date.now();
+      if (remainingTime > 0) {
+        setIsOrderButtonDisabled(true);
+        setCountdown(Math.ceil(remainingTime / 1000)); // countdownni yangilash
+        startCountdown(Math.ceil(remainingTime / 1000)); // countdownni davom ettirish
+      } else {
+        localStorage.removeItem("orderDisabledTime");
+        setIsOrderButtonDisabled(false);
+        setCountdown(0); // countdownni 0 ga o'rnating
+      }
+    }
+  }, []);
+
   const startCountdown = (duration) => {
     let timeRemaining = duration;
 
@@ -123,20 +147,6 @@ function Home() {
     }, 1000);
   };
 
-  useEffect(() => {
-    const savedTime = localStorage.getItem("orderDisabledTime");
-
-    if (savedTime) {
-      const remainingTime = parseInt(savedTime, 10) - Date.now();
-      if (remainingTime > 0) {
-        setIsOrderButtonDisabled(true);
-        setCountdown(Math.ceil(remainingTime / 1000));
-        startCountdown(Math.ceil(remainingTime / 1000));
-      } else {
-        localStorage.removeItem("orderDisabledTime");
-      }
-    }
-  }, []);
 
   useEffect(() => {
     if (alertMessage) {
@@ -325,7 +335,7 @@ function Home() {
                 <option value="other">📦 Po'chta</option>
               </select>
 
-              {gender === "" || gender === "male" || gender === "female" ? (
+              {(gender === "" || gender === "male" || gender === "female") && (
                 <select
                   value={passengerCount}
                   onChange={(e) => setPassengerCount(e.target.value)}
@@ -339,7 +349,7 @@ function Home() {
                   <option value="3">👨‍👩‍👦 3 kishi</option>
                   <option value="4">👨‍👩‍👧‍👦 4 kishi</option>
                 </select>
-              ) : null}
+              )}
 
               <input
                 ref={phoneRef}
