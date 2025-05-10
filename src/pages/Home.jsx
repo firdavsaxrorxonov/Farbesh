@@ -23,7 +23,7 @@ function Home() {
   const [isOrderButtonDisabled, setIsOrderButtonDisabled] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const navigate = useNavigate();
-  const token = Cookies.get("token");
+  const token = Cookies.get("access_token");
 
   useEffect(() => {
     if (gender === "other") {
@@ -79,10 +79,12 @@ function Home() {
     setIsOrderButtonDisabled(true);
     setIsLoading(true);
 
+
+
     await axios
       .post("https://api.aniverse.uz/order/", orderData, {
         headers: {
-          Authorization: `Token ${Cookies.get("token")}`,
+          Authorization: `Token ${Cookies.get("access_token")}`,
         },
       })
       .then((response) => {

@@ -55,8 +55,8 @@ function Login() {
       const accessToken = data?.access || data?.key;
       const refreshToken = data?.refresh;
 
-      if (accessToken) Cookies.set("access_token", accessToken);
-      if (refreshToken) Cookies.set("refresh_token", refreshToken);
+      if (accessToken) Cookies.set("access_token", accessToken, { expires: 1 / 24 });
+      if (refreshToken) Cookies.set("refresh_token", refreshToken, { expires: 1 / 24 });
 
       navigate("/home");
     } catch (err) {

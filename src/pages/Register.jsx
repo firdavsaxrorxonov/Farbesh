@@ -49,10 +49,10 @@ function Register() {
         const refreshToken = response?.data?.data?.token?.refresh;
 
         if (accessToken) {
-          Cookies.set("access_token", accessToken);
+          Cookies.set("access_token", accessToken, { expires: 1 / 24 });
         }
         if (refreshToken) {
-          Cookies.set("refresh_token", refreshToken);
+          Cookies.set("refresh_token", refreshToken, { expires: 1 / 24 });
         }
 
         navigate("/home");
