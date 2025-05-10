@@ -15,7 +15,7 @@ function Login() {
   const navigate = useNavigate();
 
   const normalizePhone = (input) => {
-    const value = input.replace(/\D/g, ""); // faqat raqamlar
+    const value = input.replace(/\D/g, "");
 
     if (value.length === 12 && value.startsWith("998")) return value;
     if (value.length === 9 && value.startsWith("9")) return "998" + value;
@@ -60,12 +60,19 @@ function Login() {
 
       navigate("/home");
     } catch (err) {
-      if (err.response?.data?.detail) {
-        setErrMsg(err.response.data.detail);
-      } else {
+      const detail = err.response?.data?.detail;
+      if (
+        detail &&
+        detail === "Не найдено активной учетной записи с указанными данными"
+      ) {
         setErrMsg("Telefon raqam yoki parol noto‘g‘ri");
+      } else if (detail) {
+        setErrMsg(detail);
+      } else {
+        setErrMsg("Tizimda noma'lum xatolik yuz berdi");
       }
-    } finally {
+    }
+    finally {
       setLoading(false);
     }
   };
@@ -93,7 +100,7 @@ function Login() {
               placeholder="998901234567"
               value={username}
               onChange={(e) => {
-                const formatted = e.target.value.replace(/[^\d]/g, ""); // faqat raqam
+                const formatted = e.target.value.replace(/[^\d]/g, "");
                 setUsername(formatted);
                 setErrMsg("");
               }}

@@ -62,13 +62,26 @@ function Register() {
         setLoading(false);
       })
       .catch((error) => {
-        if (error.response?.data.username) {
-          setError("Ushbu telefon raqami bilan foydalanuvchi allaqachon mavjud.");
-        } else {
-          setError("Tizimda xatolik yuz berdi.");
+        const status = error.response?.status;
+        const errData = error.response?.data;
+        let firstError = " Bu foydalanuvchi allaqachon royhatdan o'tgan";
+
+        if (status === 400 && errData) {
+          if (typeof errData === "string") {
+            firstError = errData;
+          } else if (errData.detail) {
+            firstError = errData.detail;
+          } else if (typeof Object.values(errData)[0] === "string") {
+            firstError = Object.values(errData)[0];
+          } else if (Array.isArray(Object.values(errData)[0])) {
+            firstError = Object.values(errData)[0][0];
+          }
         }
+
+        setError(firstError);
         setLoading(false);
       });
+
   };
 
   return (
