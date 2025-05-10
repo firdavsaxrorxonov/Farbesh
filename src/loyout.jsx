@@ -1,16 +1,18 @@
-import { Outlet, Navigate, } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
 const Layouts = () => {
-  const token = Cookies.get("token");
+  const navigate = useNavigate();
+  const token = Cookies.get("access_token");
 
-  if (!token) {
-    return <Navigate to="/" replace />;
-  }
+  useEffect(() => {
+    if (!token) {
+      navigate("/");
+    }
+  }, [token]);
 
-  return (
-    <Outlet />
-  );
+  return <Outlet />;
 };
-// Layout jsx loginni tekshirish maqsadida nimaga deb o'ylab yurmaylar!!
+
 export default Layouts;

@@ -15,13 +15,17 @@ function Login() {
   const navigate = useNavigate();
 
   const normalizePhone = (input) => {
-    const value = input.replace(/\D/g, ""); // faqat raqamlar
+    let value = input.replace(/\D/g, ""); // faqat raqamlar
 
-    if (value.length === 12 && value.startsWith("998")) return value;
-    if (value.length === 9 && value.startsWith("9")) return "998" + value;
-    if (value.length === 10 && value.startsWith("8")) return "998" + value.slice(1);
-
-    return value;
+    if (value.startsWith("998")) {
+      return value.slice(0, 12);
+    } else if (value.startsWith("8")) {
+      return "998" + value.slice(1, 10);
+    } else if (value.startsWith("9")) {
+      return "998" + value.slice(0, 9);
+    } else {
+      return value; // noto'g'ri format bo'lsa o'zini qaytaradi
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -29,28 +33,20 @@ function Login() {
     setLoading(true);
     setErrMsg("");
 
-    const phoneStr = normalizePhone(username);
-    const phone = phoneStr.length <= 15 ? Number(phoneStr) : null;
-
-    if (!phone) {
-      setErrMsg("Telefon raqam noto‘g‘ri");
-      setLoading(false);
-      return;
-    }
+    const phone = normalizePhone(username);
 
     try {
       const { data } = await axios.post(
         "https://api.aniverse.uz/auth/token/",
         {
-          phone: phone,
+          username: phone,
           password: pwd,
         },
         {
           headers: { "Content-Type": "application/json" },
-          // withCredentials: true ← bu qatorni olib tashlang!
+          withCredentials: true,
         }
       );
-
 
       const accessToken = data?.access || data?.key;
       const refreshToken = data?.refresh;
@@ -70,8 +66,6 @@ function Login() {
     }
   };
 
-
-
   return (
     <div className="relative flex flex-col items-center bg-[#fff] px-6 py-10 min-h-screen overflow-hidden font-display">
       <SecondHeader />
@@ -88,12 +82,12 @@ function Login() {
             <input
               type="tel"
               inputMode="numeric"
-              maxLength={12}
+              maxLength={13}
               className="bg-white shadow-sm px-3 py-2 border focus:border-[#FCE000] rounded-md outline-none focus:ring-0 w-full font-medium text-[#0C0E16] placeholder:text-[#0C0E16] text-sm transition-all[0.4s]"
               placeholder="998901234567"
               value={username}
               onChange={(e) => {
-                const formatted = e.target.value.replace(/[^\d]/g, ""); // faqat raqam
+                const formatted = e.target.value.replace(/[^\d+]/g, ""); // Raqamlar va "+" bo'lishi mumkin
                 setUsername(formatted);
                 setErrMsg("");
               }}

@@ -32,12 +32,15 @@ function Home() {
   }, [gender]);
 
   const orderData = {
-    direction: `${route}`,
-    phone_number: `+998${phone.replace(/\s|-/g, "")}`,
-    passengers_count: passengerCount,
-    gender: `${gender}`,
-    latitude: userLocation ? userLocation[0] : null,
-    longitude: userLocation ? userLocation[1] : null,
+    name: "Husanjon",
+    phone: `998${phone.replace(/\s|-/g, "")}`,
+    location: {
+      name: route,
+      lat: userLocation ? userLocation[0] : null,
+      long: userLocation ? userLocation[1] : null,
+    },
+    gender: gender === "male" ? "male" : gender === "female" ? "female" : "other",
+    count: passengerCount === "1" ? "one" : passengerCount === "2" ? "two" : passengerCount === "3" ? "there" : passengerCount === "4" ? "four" : "",
   };
 
   async function handleOrderClick() {
@@ -70,7 +73,7 @@ function Home() {
     setIsLoading(true);
 
     await axios
-      .post("https://farbesh.up.railway.app/api/v1/send_order/", orderData, {
+      .post("https://api.aniverse.uz/order/", orderData, {
         headers: {
           Authorization: `Token ${Cookies.get("token")}`,
         },
@@ -98,7 +101,6 @@ function Home() {
   const startCountdown = (duration) => {
     let timeRemaining = duration;
 
-    // Save initial countdown time to localStorage
     localStorage.setItem(
       "orderDisabledTime",
       Date.now() + timeRemaining * 1000
@@ -115,7 +117,7 @@ function Home() {
         localStorage.setItem(
           "orderDisabledTime",
           Date.now() + timeRemaining * 1000
-        ); // Update the countdown in localStorage
+        );
         timeRemaining--;
       }
     }, 1000);
@@ -131,7 +133,7 @@ function Home() {
         setCountdown(Math.ceil(remainingTime / 1000));
         startCountdown(Math.ceil(remainingTime / 1000));
       } else {
-        localStorage.removeItem("orderDisabledTime"); // Clear if time is up
+        localStorage.removeItem("orderDisabledTime");
       }
     }
   }, []);
@@ -235,9 +237,8 @@ function Home() {
   return (
     <div className="relative flex flex-col bg-gray-100 mx-auto max-w-md h-dvh font-display">
       <div
-        className={`transition ${
-          isModalOpen ? "blur-sm pointer-events-none" : ""
-        }`}
+        className={`transition ${isModalOpen ? "blur-sm pointer-events-none" : ""
+          }`}
       >
         <button
           onClick={(event) => {
@@ -274,11 +275,10 @@ function Home() {
             )}
             <button
               disabled={isOrderButtonDisabled}
-              className={`bottom-3 absolute bg-[#151513] px-24 py-4 mb-2 rounded-[12px] font-semibold text-white active:scale-95 transition-opacity duration-300 cursor-pointer ${
-                isOrderButtonDisabled
-                  ? "opacity-50 cursor-not-allowed"
-                  : "opacity-100"
-              }`}
+              className={`bottom-3 absolute bg-[#151513] px-24 py-4 mb-2 rounded-[12px] font-semibold text-white active:scale-95 transition-opacity duration-300 cursor-pointer ${isOrderButtonDisabled
+                ? "opacity-50 cursor-not-allowed"
+                : "opacity-100"
+                }`}
               onClick={() => setIsModalOpen(true)}
             >
               Buyurtma berish
@@ -322,7 +322,7 @@ function Home() {
                 </option>
                 <option value="male">👨 Erkak</option>
                 <option value="female">👩 Ayol</option>
-                <option value="mail">📦 Po'chta</option>
+                <option value="other">📦 Po'chta</option>
               </select>
 
               {gender === "" || gender === "male" || gender === "female" ? (
@@ -379,7 +379,7 @@ function Home() {
           <ul className="flex flex-col gap-[5px] bg-white px-[15px] py-[10px] rounded-md menu-container">
             <button
               onClick={() => {
-                Cookies.remove("token");
+                Cookies.remove("access_token");
                 navigate("/");
               }}
               className="flex text-red-500 items-center gap-[12px] cursor-pointer"
